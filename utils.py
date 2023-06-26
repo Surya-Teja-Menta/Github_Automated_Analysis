@@ -4,7 +4,8 @@ import openai
 import nbformat as nbf
 import cachetools
 import shutil
-openai.api_key = "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"
+
+openai.api_key = "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"
 
 # Initialize cache
 cache = cachetools.LRUCache(maxsize=1000)
@@ -262,6 +263,7 @@ def run(username = "webcodify"):
             QM.append(get_repo_metrics(code))
         else:
             QM.append(0)
+    print([rep['name'] for rep in repositories])
     complex_repository = repositories[QM.index(max(QM))]['name']
     complexity_score = (max(QM)/20)*100
     gc.collect()
