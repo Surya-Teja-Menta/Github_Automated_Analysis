@@ -13,6 +13,7 @@ ext = ['.c', '.cpp', '.cs', '.css', '.go', '.html', 'Dockerfile', '.htm', '.java
        '.php4', '.php5', '.pl', '.pm', '.py', '.r', '.rb', '.rs', '.scala', '.scm', '.sql', '.swift', '.vb', '.xml', '.yaml']
 
 def fetch_repositories(username):
+    print('fetch_repositories')
     try:
         """
         Fetches the repositories of a GitHub user.
@@ -236,6 +237,7 @@ def get_chunks(repo_data, chunk_size=1024):
         print(e)
 
 def run(username = "webcodify"):
+    print('run')
     repositories = fetch_repositories(username)
     repository_codes = []
     for repository in repositories:
