@@ -35,8 +35,9 @@ def main():
         if is_url(username):
             username = get_github_username(username)
         print(username)
-        text = run(username)
-        text = st.markdown(text)
+        if username:
+            text = run(username)
+            text = st.markdown(text)
     
 
 
