@@ -5,7 +5,7 @@ import nbformat as nbf
 import cachetools
 import shutil
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 # Initialize cache
 cache = cachetools.LRUCache(maxsize=1000)
@@ -191,14 +191,30 @@ def get_merged_codes(repository_codes):
     
 
 
-def get_repo_metrics(code_text):
-    try:
+def get_repo_metrics(code_text,max_code_length = 4096):
 
-        prompt = "Analyse code and measure performance and complexity\n provide only these metric, Technical Complexity: (out of 1 to 20) and don't provide anything else\n The Code:\n"
+    try:
+        code_text = code_text[:max_code_length]
+        prompt = """Analyse code and measure performance and complexity\n
+         provide the output as
+         Programming Languages that are used: score of associated coding level of each Programming Language out of 10,
+         Time Complexity: (1 to 10)
+         Space Complexity: (1 to 10)
+         Overall Technical Complexity: (out of 1 to 10) \n
+         
+         Code = '''{code_text}'''
+         Provide the output in Json Format as,
+         ''' {
+            "Language":"<Score between 1 to 10>,
+            "Time Complexity": <Score between 1 to 10>,
+            "Space Complexity": <Score between 1 to 10>,
+            "Overall Time Complexity": <Score between 1 to 10>
+         }
+         """
+
         input_text = prompt + code_text
 
         # Truncate code snippet to fit within the context limit
-        max_code_length = 4096
         truncated_code = input_text[:max_code_length]
 
         response = openai.Completion.create(
