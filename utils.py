@@ -191,67 +191,56 @@ def get_merged_codes(repository_codes):
     
 
 
-def get_repo_metrics(code_text,max_code_length = 4096):
-
-    try:
-        code_text = code_text[:max_code_length]
-        prompt = """Analyse code and measure performance and complexity\n
-         provide the output as
-         Programming Languages that are used: score of associated coding level of each Programming Language out of 10,
-         Time Complexity: (1 to 10)
-         Space Complexity: (1 to 10)
-         Overall Technical Complexity: (out of 1 to 10) \n
-         
-         Code = '''{code_text}'''
-         Provide the output in Json Format as,
-         ''' {
-            "Language":"<Score between 1 to 10>,
-            "Time Complexity": <Score between 1 to 10>,
-            "Space Complexity": <Score between 1 to 10>,
-            "Overall Time Complexity": <Score between 1 to 10>
-         }
-         """
-
-        input_text = prompt + code_text
-
-        # Truncate code snippet to fit within the context limit
-        truncated_code = input_text[:max_code_length]
-
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=truncated_code,
-            max_tokens=200,
-            temperature=0.5,
-            n=1,
-            best_of=1,
-        )
-        Technical_Complexity = response.choices[0].text.strip()
-        score = 0
-        for line in Technical_Complexity.splitlines():
-            ind = line.find('Technical_Complexity:')
-            score = (line[ind+len('Technical_Complexity:')+1:ind+len('Technical_Complexity:')+4])
-        return int(score.strip())
-    except Exception as e:
-        print(e)
+def split_string_into_list(string, words_per_string):
+    words = string.split()  # Split the string into individual words
+    num_strings = len(words) // words_per_string  # Calculate the number of strings needed
+    string_list = []
+    
+    for i in range(num_strings):
+        start_index = i * words_per_string
+        end_index = (i + 1) * words_per_string
+        string_list.append(" ".join(words[start_index:end_index]))
+    
+    # Add any remaining words to the last string
+    if len(words) % words_per_string != 0:
+        string_list.append(" ".join(words[num_strings * words_per_string:]))
+    
+    return string_list
 
 
+def get_repo_metrics(code_texts,max_code_length = 4096):
 
-def get_chunks(repo_data, chunk_size=1024):
-    try:
-        """
-        Chunks a list into smaller chunks of equal size.
+  code_texts = split_string_into_list(code_texts,max_code_length)
+  output_list = []
+  for i,code_text in enumerate(code_texts):
+    prompt = """Analyse Code and measure performance and complexity\n
+    provide the output as
+    list of all Programming Languages that are used in the code: score of associated coding level of each Programming Language out of 10,
+    Time Complexity: score out of 10
+    Space Complexity: score out of 10
+    Overall Technical Complexity: score out of 10
+    Provide the output in only Json Format and don't provide any else
+    Code = 
+      
+    """
 
-        Args:
-            repo_data: The list to be chunked.
-            chunk_size: The size of each chunk.
+    input_text = prompt + code_text
 
-        Returns:
-            A list of chunks.
-        """
-        
-        return repo_data[0:4000]
-    except Exception as e:
-        print(e)
+    # Truncate code snippet to fit within the context limit
+    truncated_code = input_text[:max_code_length]
+    messages = [{'role':'user','content':input_text}]
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages = messages,
+        temperature = 0.7
+    )
+
+    output = response.choices[0].message['content']
+    output_list.append(output)
+    print(output)
+   
+  return output_list
+
 
 def run(username = "webcodify"):
     print('run')
