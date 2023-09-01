@@ -310,6 +310,9 @@ def combine_complexities(dict_list):
 
   return all_complexities
 
+def get_result(jsp):
+    return  combine_programming_languages(merge_json(jsp)), combine_complexities(merge_json(jsp))
+    
 
 def run(username = "webcodify"):
     print('run')
