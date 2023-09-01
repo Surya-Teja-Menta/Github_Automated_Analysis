@@ -241,6 +241,74 @@ def get_repo_metrics(code_texts,max_code_length = 2040):
    
   return output_list
 
+import json
+
+def merge_json(json_strings):
+  """Merges multiple JSON strings into a single JSON string.
+
+  Args:
+    json_strings: A list of JSON strings.
+
+  Returns:
+    A single JSON string.
+  """
+  mjs = []
+  if type(json_strings) == list:
+    for i,j in enumerate(json_strings):      
+      data = json.loads(json_strings[i].replace('Score','Level'))
+
+      # Create the new format
+      format_2 = {
+          "Programming Languages": {item["Language"]: item["Level"] for item in data["Programming Languages"]},
+          "Time Complexity": data["Time Complexity"],
+          "Space Complexity": data["Space Complexity"],
+          "Overall Technical Complexity": data["Overall Technical Complexity"]
+      }
+
+      # Convert the new format to a JSON string with indentation for human readability
+      formatted_json = json.dumps(format_2, indent=2)
+      mjs.append(formatted_json)
+  return mjs
+
+def combine_json(json_strings):
+  merged_json = {}
+
+  for json_string in json_strings:
+      json_data = json.loads(json_string)
+      for key, value in json_data.items():
+          if key in merged_json:
+              merged_json[key] = (merged_json[key] + value) / 2
+          else:
+              merged_json[key] = value
+
+  return json.dumps(merged_json, indent=2)
+
+# Method to combine programming languages
+def combine_programming_languages(dict_list):
+  # Extract programming languages dictionaries
+  language_dicts = [json.loads(d).get("Programming Languages", {}) for d in dict_list]
+  
+  # Combine programming languages using the combine_json method
+  combined_languages = combine_json([json.dumps(lang_dict) for lang_dict in language_dicts])
+  
+  return json.loads(combined_languages)
+
+# Method to combine complexities (Time, Space, Technical)
+def combine_complexities(dict_list):
+  # Initialize dictionary for all complexities
+  all_complexities = {}
+
+  for d in dict_list:
+    d = json.loads(d)
+    # Combine complexities for each dictionary
+    for key, value in d.items():
+      if key != "Programming Languages":        
+        if key in all_complexities:
+            all_complexities[key] = (all_complexities[key] + value) / 2
+        else:
+            all_complexities[key] = value
+
+  return all_complexities
 
 
 def run(username = "webcodify"):
