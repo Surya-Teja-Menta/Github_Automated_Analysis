@@ -192,6 +192,7 @@ def get_merged_codes(repository_codes):
 
 
 def split_string_into_list(string, words_per_string):
+    print("Max Length:",words_per_string)
     words = string.split()  # Split the string into individual words
     num_strings = len(words) // words_per_string  # Calculate the number of strings needed
     string_list = []
@@ -200,15 +201,13 @@ def split_string_into_list(string, words_per_string):
         start_index = i * words_per_string
         end_index = (i + 1) * words_per_string
         string_list.append(" ".join(words[start_index:end_index]))
-    
+    print('Number of Lists:',len(string_list))
     # Add any remaining words to the last string
     if len(words) % words_per_string != 0:
         string_list.append(" ".join(words[num_strings * words_per_string:]))
     
     return string_list
-
-
-def get_repo_metrics(code_texts,max_code_length = 4096):
+def get_repo_metrics(code_texts,max_code_length = 2040):
 
   code_texts = split_string_into_list(code_texts,max_code_length)
   output_list = []
@@ -219,6 +218,7 @@ def get_repo_metrics(code_texts,max_code_length = 4096):
     Time Complexity: score out of 10
     Space Complexity: score out of 10
     Overall Technical Complexity: score out of 10
+    Rule: 0 means bad and 10 means good
     Provide the output in only Json Format and don't provide any else
     Code = 
       
@@ -237,9 +237,10 @@ def get_repo_metrics(code_texts,max_code_length = 4096):
 
     output = response.choices[0].message['content']
     output_list.append(output)
-    print(output)
+    # print(output)
    
   return output_list
+
 
 
 def run(username = "webcodify"):
