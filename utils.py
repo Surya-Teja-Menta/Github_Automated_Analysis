@@ -4,6 +4,8 @@ import openai
 import nbformat as nbf
 import cachetools
 import shutil
+import json
+
 
 openai.api_key = "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"
 
@@ -218,7 +220,7 @@ def get_repo_metrics(code_texts,max_code_length = 2040):
     Time Complexity: score out of 10
     Space Complexity: score out of 10
     Overall Technical Complexity: score out of 10
-    Rule: 0 means bad and 10 means good
+    Rule: 0 means bad level and 10 means good level
     Provide the output in only Json Format and don't provide any else
     Code = 
       
@@ -241,34 +243,42 @@ def get_repo_metrics(code_texts,max_code_length = 2040):
    
   return output_list
 
-import json
 
 def merge_json(json_strings):
-  """Merges multiple JSON strings into a single JSON string.
+  try:
 
-  Args:
-    json_strings: A list of JSON strings.
+    """Merges multiple JSON strings into a single JSON string.
 
-  Returns:
-    A single JSON string.
-  """
-  mjs = []
-  if type(json_strings) == list:
-    for i,j in enumerate(json_strings):      
-      data = json.loads(json_strings[i].replace('Score','Level'))
+    Args:
+      json_strings: A list of JSON strings.
 
-      # Create the new format
-      format_2 = {
-          "Programming Languages": {item["Language"]: item["Level"] for item in data["Programming Languages"]},
-          "Time Complexity": data["Time Complexity"],
-          "Space Complexity": data["Space Complexity"],
-          "Overall Technical Complexity": data["Overall Technical Complexity"]
-      }
+    Returns:
+      A single JSON string.
+    """
+    mjs = []
+    if type(json_strings) == list:
+      for i,j in enumerate(json_strings):      
+        data = json.loads(json_strings[i].replace('Coding Level','Level').replace('Score','Level'))
+        # data = json.loads(json_strings[i].replace('Score','Level'))
 
-      # Convert the new format to a JSON string with indentation for human readability
-      formatted_json = json.dumps(format_2, indent=2)
-      mjs.append(formatted_json)
-  return mjs
+        # Create the new format
+        try:
+
+          format_2 = {
+              "Programming Languages": {item["Language"]: item["Level"] for item in data["Programming Languages"]},
+              "Time Complexity": data["Time Complexity"],
+              "Space Complexity": data["Space Complexity"],
+              "Overall Technical Complexity": data["Overall Technical Complexity"]
+          }
+        except Exception as e:
+          print('Key Error:',data)
+
+        # Convert the new format to a JSON string with indentation for human readability
+        formatted_json = json.dumps(format_2, indent=2)
+        mjs.append(formatted_json)
+    return mjs
+  except Exception as e:
+    print(e)
 
 def combine_json(json_strings):
   merged_json = {}
@@ -310,8 +320,9 @@ def combine_complexities(dict_list):
 
   return all_complexities
 
+
 def get_result(jsp):
-    return  combine_programming_languages(merge_json(jsp)), combine_complexities(merge_json(jsp))
+    return  dict({**combine_programming_languages(merge_json(jsp)),**combine_complexities(merge_json(jsp))})
     
 
 def run(username = "webcodify"):
@@ -341,8 +352,8 @@ def run(username = "webcodify"):
         else:
             QM.append(0)
     print([rep['name'] for rep in repositories])
-    complex_repository = repositories[QM.index(max(QM))]['name']
-    complexity_score = (max(QM)/20)*100
+    # complex_repository = repositories[QM.index(max(QM))]['name']
+    # complexity_score = (max(QM)/20)*100
     gc.collect()
     for rep in repositories:
         shutil.rmtree(rep['name'])
