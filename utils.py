@@ -63,33 +63,6 @@ def download_repository(repository):
     except Exception as e:
         print(e)
 
-
-def preprocess_code(code):
-    try:
-        """
-        Preprocesses the code by removing comments and unnecessary whitespace.
-
-        Args:
-            code: The code to be preprocessed.
-
-        Returns:
-            The preprocessed code.
-        """
-        code = re.sub(r"\/\/.*?$", "", code, flags=re.MULTILINE)
-        code = re.sub(r"\/\*.*?\*\/", "", code, flags=re.DOTALL)
-        code = re.sub(r"(['\"]{3})(.*?)\1", '', code, flags=re.DOTALL)
-        code = re.sub(r"#+\s?(.*)", "", code)
-        code = re.sub(r'\s+', ' ', code)
-        code = re.sub(r"<!--(.*?)-->", "", code)
-        code = re.sub(r"\/\*\*.*?\*\/", "", code, flags=re.DOTALL)
-        comments = re.compile(r"//.*?$|/\*.*?\*/|<!--.*?-->|#.*?$", re.MULTILINE)
-        code = comments.sub("", code)
-        code = code.strip()
-        return code
-    except Exception as e:
-        print(e)
-    
-
 def identify_coding_files(repository):
     try:
         """
@@ -135,6 +108,32 @@ def get_code_from_notebook(notebook_filepath):
     except Exception as e:
         print(e)
 
+
+def preprocess_code(code):
+    try:
+        """
+        Preprocesses the code by removing comments and unnecessary whitespace.
+
+        Args:
+            code: The code to be preprocessed.
+
+        Returns:
+            The preprocessed code.
+        """
+        code = re.sub(r"\/\/.*?$", "", code, flags=re.MULTILINE)
+        code = re.sub(r"\/\*.*?\*\/", "", code, flags=re.DOTALL)
+        code = re.sub(r"(['\"]{3})(.*?)\1", '', code, flags=re.DOTALL)
+        code = re.sub(r"#+\s?(.*)", "", code)
+        code = re.sub(r'\s+', ' ', code)
+        code = re.sub(r"<!--(.*?)-->", "", code)
+        code = re.sub(r"\/\*\*.*?\*\/", "", code, flags=re.DOTALL)
+        comments = re.compile(r"//.*?$|/\*.*?\*/|<!--.*?-->|#.*?$", re.MULTILINE)
+        code = comments.sub("", code)
+        code = code.strip()
+        return code
+    except Exception as e:
+        print(e)
+    
 
 def download_and_preprocess(repository):
     try:
